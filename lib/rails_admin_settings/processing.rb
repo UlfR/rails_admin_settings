@@ -10,7 +10,7 @@ module RailsAdminSettings
     end
 
     def text_kind?
-      (RailsAdminSettings.kinds - ['phone', 'phones', 'integer', 'yaml']).include? kind
+      (RailsAdminSettings.kinds - ['phone', 'phones', 'integer', 'yaml', 'boolean']).include? kind
     end
 
     def upload_kind?
@@ -20,6 +20,7 @@ module RailsAdminSettings
     def html_kind?
       ['html', 'sanitized'].include? kind
     end
+
     alias_method :text_type?, :text_kind?
     alias_method :upload_type?, :upload_kind?
     alias_method :html_type?, :html_kind?
@@ -49,7 +50,7 @@ module RailsAdminSettings
     end
 
     def to_s
-      if yaml_kind? || phone_kind? || integer_kind?
+      if yaml_kind? || phone_kind? || integer_kind? || boolean_kind?
         raw
       else
         value
@@ -71,6 +72,8 @@ module RailsAdminSettings
         ''
       elsif integer_kind?
         0
+      elsif boolean_kind?
+        false
       elsif yaml_kind?
         nil
       elsif phone_kind?
@@ -87,6 +90,8 @@ module RailsAdminSettings
     def default_serializable_value
       if phones_kind?
         ''
+      elsif boolean_kind?
+        'false'
       else
         default_value
       end
@@ -129,6 +134,8 @@ module RailsAdminSettings
         process_text
       elsif integer_kind?
         raw.to_i
+      elsif boolean_kind?
+        raw == 'true'
       elsif yaml_kind?
         load_yaml
       elsif phone_kind?
